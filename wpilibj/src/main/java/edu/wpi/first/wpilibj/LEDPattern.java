@@ -330,14 +330,9 @@ public interface LEDPattern {
             // Apply the cosine function and shift its output from [-1, 1] to [0, 1]
             // Use cosine so the period starts at 100% brightness
             double dim = (Math.cos(phase) + 1) / 2.0;
+            Color output = Color.kBlack.interpolate(new Color(r, g, b), dim);
 
-            int output = Color.lerpRGB(0, 0, 0, r, g, b, dim);
-
-            writer.setRGB(
-                i,
-                Color.unpackRGB(output, Color.RGBChannel.kRed),
-                Color.unpackRGB(output, Color.RGBChannel.kGreen),
-                Color.unpackRGB(output, Color.RGBChannel.kBlue));
+            writer.setLED(i, output);
           });
     };
   }
@@ -383,15 +378,8 @@ public interface LEDPattern {
       other.applyTo(
           reader,
           (i, r, g, b) -> {
-            int blendedRGB =
-                Color.lerpRGB(
-                    reader.getRed(i), reader.getGreen(i), reader.getBlue(i), r, g, b, 0.5);
-
-            writer.setRGB(
-                i,
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kRed),
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kGreen),
-                Color.unpackRGB(blendedRGB, Color.RGBChannel.kBlue));
+            Color blended = reader.getLED(i).interpolate(new Color(r, g, b), 0.5);
+            writer.setLED(i, blended);
           });
     };
   }
@@ -574,6 +562,18 @@ public interface LEDPattern {
    * Creates a pattern that displays a non-animated gradient of colors across the entire length of
    * the LED strip. The gradient wraps around so the start and end of the strip are the same color,
    * which allows the gradient to be modified with a scrolling effect with no discontinuities.
+   *
+   * <p>This function is generic over Color space. Try LinearSRGB and Oklab for different color
+   * spaces.
+   *
+   * @param colors the colors to display in the gradient
+   * @return
+   */
+
+  /**
+   * Creates a pattern that displays a non-animated gradient of colors across the entire length of
+   * the LED strip. The gradient wraps around so the start and end of the strip are the same color,
+   * which allows the gradient to be modified with a scrolling effect with no discontinuities.
    * Colors are evenly distributed along the full length of the LED strip.
    *
    * @param colors the colors to display in the gradient
@@ -605,21 +605,9 @@ public interface LEDPattern {
 
         Color color = colors[colorIndex];
         Color nextColor = colors[nextColorIndex];
-        int gradientColor =
-            Color.lerpRGB(
-                color.red,
-                color.green,
-                color.blue,
-                nextColor.red,
-                nextColor.green,
-                nextColor.blue,
-                t);
+        Color gradientColor = color.interpolate(nextColor, t);
 
-        writer.setRGB(
-            led,
-            Color.unpackRGB(gradientColor, Color.RGBChannel.kRed),
-            Color.unpackRGB(gradientColor, Color.RGBChannel.kGreen),
-            Color.unpackRGB(gradientColor, Color.RGBChannel.kBlue));
+        writer.setLED(led, gradientColor);
       }
     };
   }

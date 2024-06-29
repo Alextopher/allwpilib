@@ -103,6 +103,8 @@ class LEDPatternTest {
     for (int i = 0; i < buffer.getLength(); i++) {
       assertEquals(kYellow, buffer.getLED(i));
     }
+
+    assertEquals(kYellow, buffer.getLED(0));
   }
 
   @Test
@@ -112,11 +114,11 @@ class LEDPatternTest {
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     pattern.applyTo(buffer);
 
-    assertColorEquals(kYellow, buffer.getLED(0));
-    assertColorEquals(Color.lerpRGB(kYellow, kPurple, 25 / 49.0), buffer.getLED(25));
-    assertColorEquals(kPurple, buffer.getLED(49));
-    assertColorEquals(Color.lerpRGB(kYellow, kPurple, 25 / 49.0), buffer.getLED(73));
-    assertColorEquals(kYellow, buffer.getLED(98));
+    assertEquals(kYellow, buffer.getLED(0));
+    assertEquals(kYellow.interpolate(kPurple, 25 / 49.0), buffer.getLED(25));
+    assertEquals(kPurple, buffer.getLED(49));
+    assertEquals(kPurple.interpolate(kYellow, 25 / 49.0), buffer.getLED(74));
+    assertEquals(kYellow, buffer.getLED(98));
   }
 
   @Test
@@ -125,13 +127,13 @@ class LEDPatternTest {
     AddressableLEDBuffer buffer = new AddressableLEDBuffer(99);
     pattern.applyTo(buffer);
 
-    assertColorEquals(kYellow, buffer.getLED(0));
-    assertColorEquals(Color.lerpRGB(kYellow, kPurple, 25.0 / 33.0), buffer.getLED(25));
-    assertColorEquals(kPurple, buffer.getLED(33));
-    assertColorEquals(Color.lerpRGB(kPurple, kWhite, 25.0 / 33.0), buffer.getLED(58));
-    assertColorEquals(kWhite, buffer.getLED(66));
-    assertColorEquals(Color.lerpRGB(kWhite, kYellow, 25.0 / 33.0), buffer.getLED(91));
-    assertColorEquals(Color.lerpRGB(kWhite, kYellow, 32.0 / 33.0), buffer.getLED(98));
+    assertEquals(kYellow, buffer.getLED(0));
+    assertEquals(kYellow.interpolate(kPurple, 25 / 33.0), buffer.getLED(25));
+    assertEquals(kPurple, buffer.getLED(33));
+    assertEquals(kPurple.interpolate(kWhite, 25 / 33.0), buffer.getLED(58));
+    assertEquals(kWhite, buffer.getLED(66));
+    assertEquals(kWhite.interpolate(kYellow, 25 / 33.0), buffer.getLED(91));
+    assertEquals(kWhite.interpolate(kYellow, 32 / 33.0), buffer.getLED(98));
   }
 
   @Test
@@ -145,7 +147,7 @@ class LEDPatternTest {
 
     pattern.applyTo(buffer);
     for (int i = 0; i < 99; i++) {
-      assertColorEquals(kBlack, buffer.getLED(i));
+      assertEquals(kBlack, buffer.getLED(i));
     }
   }
 
@@ -157,7 +159,7 @@ class LEDPatternTest {
 
     pattern.applyTo(buffer);
     for (int i = 0; i < 99; i++) {
-      assertColorEquals(kYellow, buffer.getLED(i));
+      assertEquals(kYellow, buffer.getLED(i));
     }
   }
 
@@ -170,11 +172,11 @@ class LEDPatternTest {
 
     // [0, 48] should be black...
     for (int i = 0; i < 49; i++) {
-      assertColorEquals(kBlack, buffer.getLED(i));
+      assertEquals(kBlack, buffer.getLED(i));
     }
     // ... and [49, <end>] should be the color that was set
     for (int i = 49; i < buffer.getLength(); i++) {
-      assertColorEquals(kYellow, buffer.getLED(i));
+      assertEquals(kYellow, buffer.getLED(i));
     }
   }
 
@@ -329,7 +331,7 @@ class LEDPatternTest {
     pattern.applyTo(buffer);
 
     for (int led = 0; led < buffer.getLength(); led++) {
-      assertColorEquals(Color.fromHSV(led, saturation, value), buffer.getLED(led));
+      assertEquals(Color.fromHSV(led, saturation, value), buffer.getLED(led));
     }
   }
 
@@ -344,7 +346,7 @@ class LEDPatternTest {
     pattern.applyTo(buffer);
 
     for (int led = 0; led < buffer.getLength(); led++) {
-      assertColorEquals(Color.fromHSV(led * 2, saturation, value), buffer.getLED(led));
+      assertEquals(Color.fromHSV(led * 2, saturation, value), buffer.getLED(led));
     }
   }
 
@@ -359,7 +361,7 @@ class LEDPatternTest {
     pattern.applyTo(buffer);
 
     for (int led = 0; led < buffer.getLength(); led++) {
-      assertColorEquals(Color.fromHSV(led * 3, saturation, value), buffer.getLED(led));
+      assertEquals(Color.fromHSV(led * 3, saturation, value), buffer.getLED(led));
     }
   }
 
@@ -374,7 +376,7 @@ class LEDPatternTest {
     pattern.applyTo(buffer);
 
     for (int led = 0; led < buffer.getLength(); led++) {
-      assertColorEquals(Color.fromHSV(led / 2, saturation, value), buffer.getLED(led));
+      assertEquals(Color.fromHSV(led / 2, saturation, value), buffer.getLED(led));
     }
   }
 
@@ -390,7 +392,7 @@ class LEDPatternTest {
     pattern.applyTo(buffer);
 
     for (int led = 0; led < buffer.getLength(); led++) {
-      assertColorEquals(Color.fromHSV((int) (led * scale), saturation, value), buffer.getLED(led));
+      assertEquals(Color.fromHSV((int) (led * scale), saturation, value), buffer.getLED(led));
     }
   }
 
@@ -402,7 +404,7 @@ class LEDPatternTest {
     pattern.applyTo(buffer);
 
     for (int led = 0; led < buffer.getLength(); led++) {
-      assertColorEquals(Color.kRosyBrown, buffer.getLED(led));
+      assertEquals(Color.kRosyBrown, buffer.getLED(led));
     }
   }
 
@@ -416,9 +418,9 @@ class LEDPatternTest {
     // colors should be swapped; yellow first, then white
     for (int led = 0; led < buffer.getLength(); led++) {
       if (led < 50) {
-        assertColorEquals(kYellow, buffer.getLED(led));
+        assertEquals(kYellow, buffer.getLED(led));
       } else {
-        assertColorEquals(kWhite, buffer.getLED(led));
+        assertEquals(kWhite, buffer.getLED(led));
       }
     }
   }
@@ -435,13 +437,13 @@ class LEDPatternTest {
       Color color = buffer.getLED(led);
       switch (led % 3) {
         case 0:
-          assertColorEquals(kPurple, color);
+          assertEquals(kPurple, color);
           break;
         case 1:
-          assertColorEquals(kWhite, color);
+          assertEquals(kWhite, color);
           break;
         case 2:
-          assertColorEquals(kYellow, color);
+          assertEquals(kYellow, color);
           break;
         default:
           fail("Bad test setup");
@@ -462,13 +464,13 @@ class LEDPatternTest {
       Color color = buffer.getLED(led);
       switch (led % 3) {
         case 0:
-          assertColorEquals(kYellow, color);
+          assertEquals(kYellow, color);
           break;
         case 1:
-          assertColorEquals(kPurple, color);
+          assertEquals(kPurple, color);
           break;
         case 2:
-          assertColorEquals(kWhite, color);
+          assertEquals(kWhite, color);
           break;
         default:
           fail("Bad test setup");
@@ -489,13 +491,13 @@ class LEDPatternTest {
       Color color = buffer.getLED(led);
       switch (led % 3) {
         case 0:
-          assertColorEquals(kWhite, color);
+          assertEquals(kWhite, color);
           break;
         case 1:
-          assertColorEquals(kYellow, color);
+          assertEquals(kYellow, color);
           break;
         case 2:
-          assertColorEquals(kPurple, color);
+          assertEquals(kPurple, color);
           break;
         default:
           fail("Bad test setup");
@@ -521,13 +523,13 @@ class LEDPatternTest {
         case 1:
         case 4:
         case 5:
-          assertColorEquals(kWhite, color);
+          assertEquals(kWhite, color);
           break;
         case 2:
         case 3:
         case 6:
         case 7:
-          assertColorEquals(kBlack, color);
+          assertEquals(kBlack, color);
           break;
         default:
           fail("Bad test setup");
@@ -555,11 +557,11 @@ class LEDPatternTest {
         case 4:
         case 5:
         case 6: // second period
-          assertColorEquals(kWhite, color);
+          assertEquals(kWhite, color);
           break;
         case 3:
         case 7:
-          assertColorEquals(kBlack, color);
+          assertEquals(kBlack, color);
           break;
         default:
           fail("Bad test setup");
@@ -576,15 +578,15 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
 
     pattern.applyTo(buffer);
-    assertColorEquals(kBlack, buffer.getLED(0));
+    assertEquals(kBlack, buffer.getLED(0));
 
     condition.set(true);
     pattern.applyTo(buffer);
-    assertColorEquals(kWhite, buffer.getLED(0));
+    assertEquals(kWhite, buffer.getLED(0));
 
     condition.set(false);
     pattern.applyTo(buffer);
-    assertColorEquals(kBlack, buffer.getLED(0));
+    assertEquals(kBlack, buffer.getLED(0));
   }
 
   @Test
@@ -598,31 +600,31 @@ class LEDPatternTest {
     {
       WPIUtilJNI.setMockTime(0); // start
       pattern.applyTo(buffer);
-      assertColorEquals(kWhite, buffer.getLED(0));
+      assertEquals(kWhite, buffer.getLED(0));
     }
 
     {
       WPIUtilJNI.setMockTime(1); // midway (down)
       pattern.applyTo(buffer);
-      assertColorEquals(midGray, buffer.getLED(0));
+      assertEquals(midGray, buffer.getLED(0));
     }
 
     {
       WPIUtilJNI.setMockTime(2); // bottom
       pattern.applyTo(buffer);
-      assertColorEquals(kBlack, buffer.getLED(0));
+      assertEquals(kBlack, buffer.getLED(0));
     }
 
     {
       WPIUtilJNI.setMockTime(3); // midway (up)
       pattern.applyTo(buffer);
-      assertColorEquals(midGray, buffer.getLED(0));
+      assertEquals(midGray, buffer.getLED(0));
     }
 
     {
       WPIUtilJNI.setMockTime(4); // back to start
       pattern.applyTo(buffer);
-      assertColorEquals(kWhite, buffer.getLED(0));
+      assertEquals(kWhite, buffer.getLED(0));
     }
   }
 
@@ -633,7 +635,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
     overlay.applyTo(buffer);
 
-    assertColorEquals(kYellow, buffer.getLED(0));
+    assertEquals(kYellow, buffer.getLED(0));
   }
 
   @Test
@@ -644,7 +646,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
     overlay.applyTo(buffer);
 
-    assertColorEquals(overlayColor, buffer.getLED(0));
+    assertEquals(overlayColor, buffer.getLED(0));
   }
 
   @Test
@@ -655,8 +657,8 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(2);
     overlay.applyTo(buffer);
 
-    assertColorEquals(kYellow, buffer.getLED(0));
-    assertColorEquals(kWhite, buffer.getLED(1));
+    assertEquals(kYellow, buffer.getLED(0));
+    assertEquals(kWhite, buffer.getLED(1));
   }
 
   @Test
@@ -669,7 +671,7 @@ class LEDPatternTest {
     blend.applyTo(buffer);
 
     // Individual RGB channels are averaged; #0000FF blended with #FF0000 yields #7F007F
-    assertColorEquals(new Color(127, 0, 127), buffer.getLED(0));
+    assertEquals(new Color(127, 0, 127), buffer.getLED(0));
   }
 
   @Test
@@ -684,11 +686,11 @@ class LEDPatternTest {
     masked.applyTo(buffer);
 
     for (int i = 0; i < 5; i++) {
-      assertColorEquals(color, buffer.getLED(i));
+      assertEquals(color, buffer.getLED(i));
     }
 
     for (int i = 5; i < 10; i++) {
-      assertColorEquals(kBlack, buffer.getLED(i));
+      assertEquals(kBlack, buffer.getLED(i));
     }
   }
 
@@ -706,14 +708,14 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(5);
     masked.applyTo(buffer);
 
-    assertColorEquals(new Color(123, 0, 0), buffer.getLED(0)); // red channel only
-    assertColorEquals(new Color(0, 123, 0), buffer.getLED(1)); // green channel only
-    assertColorEquals(new Color(0, 0, 123), buffer.getLED(2)); // blue channel only
+    assertEquals(new Color(123, 0, 0), buffer.getLED(0)); // red channel only
+    assertEquals(new Color(0, 123, 0), buffer.getLED(1)); // green channel only
+    assertEquals(new Color(0, 0, 123), buffer.getLED(2)); // blue channel only
 
     // mask channels are all 0b00111111, base is 0b00111011,
     // so the AND should give us the unmodified base color
-    assertColorEquals(baseColor, buffer.getLED(3));
-    assertColorEquals(baseColor, buffer.getLED(4)); // full color allowed
+    assertEquals(baseColor, buffer.getLED(3));
+    assertEquals(baseColor, buffer.getLED(4)); // full color allowed
   }
 
   @Test
@@ -728,14 +730,14 @@ class LEDPatternTest {
 
       int lastMaskedLED = (int) (t * 100);
       for (int i = 0; i < lastMaskedLED; i++) {
-        assertColorEquals(
+        assertEquals(
             kWhite,
             buffer.getLED(i),
             "Progress " + lastMaskedLED + "%, LED " + i + " should be WHITE");
       }
 
       for (int i = lastMaskedLED; i < 100; i++) {
-        assertColorEquals(
+        assertEquals(
             kBlack,
             buffer.getLED(i),
             "Progress " + lastMaskedLED + "% , LED " + i + " should be BLACK");
@@ -749,7 +751,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
     pattern.applyTo(buffer);
 
-    assertColorEquals(kBlack, buffer.getLED(0));
+    assertEquals(kBlack, buffer.getLED(0));
   }
 
   @Test
@@ -758,7 +760,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
     pattern.applyTo(buffer);
 
-    assertColorEquals(kMagenta, buffer.getLED(0));
+    assertEquals(kMagenta, buffer.getLED(0));
   }
 
   @Test
@@ -767,7 +769,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
     pattern.applyTo(buffer);
 
-    assertColorEquals(kMagenta, buffer.getLED(0));
+    assertEquals(kMagenta, buffer.getLED(0));
   }
 
   @Test
@@ -776,7 +778,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
     pattern.applyTo(buffer);
 
-    assertColorEquals(kBlack, buffer.getLED(0));
+    assertEquals(kBlack, buffer.getLED(0));
   }
 
   @Test
@@ -785,14 +787,6 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
     pattern.applyTo(buffer);
 
-    assertColorEquals(kWhite, buffer.getLED(0));
-  }
-
-  void assertColorEquals(Color expected, Color actual) {
-    assertEquals(new Color8Bit(expected), new Color8Bit(actual));
-  }
-
-  void assertColorEquals(Color expected, Color actual, String message) {
-    assertEquals(new Color8Bit(expected), new Color8Bit(actual), message);
+    assertEquals(kWhite, buffer.getLED(0));
   }
 }

@@ -8,12 +8,12 @@ import edu.wpi.first.math.MathUtil;
 import java.util.Objects;
 
 /**
- * Represents colors.
+ * Represent a sRGB color. This is the typical color space used in computer graphics.
  *
  * <p>Limited to 12 bits of precision.
  */
 @SuppressWarnings("MemberName")
-public class Color {
+public class Color implements ColorSpace<Color> {
   /** Red component (0-1). */
   public final double red;
 
@@ -40,10 +40,9 @@ public class Color {
    * @param blue Blue value (0-1)
    */
   public Color(double red, double green, double blue) {
-    this.red = roundAndClamp(red);
-    this.green = roundAndClamp(green);
-    this.blue = roundAndClamp(blue);
-    this.m_name = null;
+    this.red = MathUtil.clamp(red, 0.0, 1.0);
+    this.green = MathUtil.clamp(green, 0.0, 1.0);
+    this.blue = MathUtil.clamp(blue, 0.0, 1.0);
   }
 
   /**
@@ -74,9 +73,9 @@ public class Color {
    * @param blue Blue value (0-1)
    */
   private Color(double red, double green, double blue, String name) {
-    this.red = roundAndClamp(red);
-    this.green = roundAndClamp(green);
-    this.blue = roundAndClamp(blue);
+    this.red = MathUtil.clamp(red, 0.0, 1.0);
+    this.green = MathUtil.clamp(green, 0.0, 1.0);
+    this.blue = MathUtil.clamp(blue, 0.0, 1.0);
     this.m_name = name;
   }
 
@@ -112,6 +111,9 @@ public class Color {
         unpackRGB(rgb, RGBChannel.kBlue));
   }
 
+  /**
+   * 2 colors are considered equal if channels compare equal when rounded to 8 bits of precision.
+   */
   @Override
   public boolean equals(Object other) {
     if (this == other) {
@@ -122,9 +124,7 @@ public class Color {
     }
 
     Color color = (Color) other;
-    return Double.compare(color.red, red) == 0
-        && Double.compare(color.green, green) == 0
-        && Double.compare(color.blue, blue) == 0;
+    return new Color8Bit(this).equals(new Color8Bit(color));
   }
 
   @Override
@@ -149,10 +149,6 @@ public class Color {
   public String toHexString() {
     return String.format(
         "#%02X%02X%02X", (int) (red * 255), (int) (green * 255), (int) (blue * 255));
-  }
-
-  private static double roundAndClamp(double value) {
-    return MathUtil.clamp(Math.ceil(value * (1 << 12)) / (1 << 12), 0.0, 1.0);
   }
 
   // Helper methods
@@ -267,70 +263,22 @@ public class Color {
     };
   }
 
-  /**
-   * Performs a linear interpolation between two colors in the RGB colorspace.
-   *
-   * @param a the first color to interpolate from
-   * @param b the second color to interpolate from
-   * @param t the interpolation scale in [0, 1]
-   * @return the interpolated color
-   */
-  public static Color lerpRGB(Color a, Color b, double t) {
-    int packedRGB = lerpRGB(a.red, a.green, a.blue, b.red, b.green, b.blue, t);
-
+  @Override
+  public Color interpolate(Color endValue, double t) {
     return new Color(
-        unpackRGB(packedRGB, RGBChannel.kRed),
-        unpackRGB(packedRGB, RGBChannel.kGreen),
-        unpackRGB(packedRGB, RGBChannel.kBlue));
+        MathUtil.interpolate(red, endValue.red, t),
+        MathUtil.interpolate(green, endValue.green, t),
+        MathUtil.interpolate(blue, endValue.blue, t));
   }
 
-  /**
-   * Linearly interpolates between two RGB colors represented by the (r1, g1, b1) and (r2, g2, b2)
-   * triplets. For memory performance reasons, the output color is returned packed into a single
-   * 32-bit integer; use {@link #unpackRGB(int, RGBChannel)} to extract the values for the
-   * individual red, green, and blue channels.
-   *
-   * @param r1 the red value of the first color, in [0, 1]
-   * @param g1 the green value of the first color, in [0, 1]
-   * @param b1 the blue value of the first color, in [0, 1]
-   * @param r2 the red value of the second color, in [0, 1]
-   * @param g2 the green value of the second color, in [0, 1]
-   * @param b2 the blue value of the second color, in [0, 1]
-   * @param t the interpolation value, in [0, 1]
-   * @return the interpolated color, packed in a 32-bit integer
-   */
-  public static int lerpRGB(
-      double r1, double g1, double b1, double r2, double g2, double b2, double t) {
-    return lerpRGB(
-        (int) (r1 * 255),
-        (int) (g1 * 255),
-        (int) (b1 * 255),
-        (int) (r2 * 255),
-        (int) (g2 * 255),
-        (int) (b2 * 255),
-        t);
+  @Override
+  public int toPackedRGB() {
+    return packRGB((int) (red * 255), (int) (green * 255), (int) (blue * 255));
   }
 
-  /**
-   * Linearly interpolates between two RGB colors represented by the (r1, g1, b1) and (r2, g2, b2)
-   * triplets. For memory performance reasons, the output color is returned packed into a single
-   * 32-bit integer; use {@link #unpackRGB(int, RGBChannel)} to extract the values for the
-   * individual red, green, and blue channels.
-   *
-   * @param r1 the red value of the first color, in [0, 255]
-   * @param g1 the green value of the first color, in [0, 255]
-   * @param b1 the blue value of the first color, in [0, 255]
-   * @param r2 the red value of the second color, in [0, 255]
-   * @param g2 the green value of the second color, in [0, 255]
-   * @param b2 the blue value of the second color, in [0, 255]
-   * @param t the interpolation value, in [0, 1]
-   * @return the interpolated color, packed in a 32-bit integer
-   */
-  public static int lerpRGB(int r1, int g1, int b1, int r2, int g2, int b2, double t) {
-    return packRGB(
-        (int) MathUtil.interpolate(r1, r2, t),
-        (int) MathUtil.interpolate(g1, g2, t),
-        (int) MathUtil.interpolate(b1, b2, t));
+  @Override
+  public Color toRGB() {
+    return this;
   }
 
   /*

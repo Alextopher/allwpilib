@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import edu.wpi.first.math.Pair;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -74,11 +76,23 @@ class ColorTest {
 
   @Test
   void testFromHSV() {
-    var color = Color.fromHSV(90, 128, 64);
+    List<Pair<Color, Color>> pairs =
+        List.of(
+            new Pair<>(Color.fromHSV(0, 255, 255), new Color(1.0, 0.0, 0.0)), // Red
+            new Pair<>(Color.fromHSV(60, 255, 255), new Color(0.0, 1.0, 0.0)), // Green
+            new Pair<>(Color.fromHSV(120, 255, 255), new Color(0.0, 0.0, 1.0)), // Blue
+            new Pair<>(Color.fromHSV(30, 255, 255), new Color(1.0, 1.0, 0.0)), // Yellow
+            new Pair<>(Color.fromHSV(90, 255, 255), new Color(0.0, 1.0, 1.0)), // Cyan
+            new Pair<>(Color.fromHSV(150, 255, 255), new Color(1.0, 0.0, 1.0)), // Magenta
+            new Pair<>(Color.fromHSV(0, 0, 0), new Color(0.0, 0.0, 0.0)), // Black
+            new Pair<>(Color.fromHSV(0, 0, 255), new Color(1.0, 1.0, 1.0)) // White
+            );
 
-    assertEquals(0.125732421875, color.red);
-    assertEquals(0.251220703125, color.green);
-    assertEquals(0.251220703125, color.blue);
+    for (Pair<Color, Color> pair : pairs) {
+      Color color = pair.getFirst();
+      Color expected = pair.getSecond();
+      assertEquals(expected, color);
+    }
   }
 
   @Test
